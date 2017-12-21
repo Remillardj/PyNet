@@ -9,13 +9,43 @@ Output: Download speed by megabytes per second
 '''
 
 import time
-import psutil
 import logging
+import os
 
-logging.basicConfig(filename="network_monitor.log",
-					level=logging.INFO,
-					format="%(asctime)s:%(levelname)s:%(message)s"
-					)
+# Install psutil if it does not exist
+try:
+	import psutil
+except ImportError:
+	import subprocess
+	subprocess.call("pip install --user psutil")
+
+loggerFormat = "%(asctime)s:%(levelname)s:%(message)s" # TODO: set in config file
+loggerPath = "/var/log/trackNetworkSpeed.log" # TODO: set in config file
+
+# Create log file if it does not exist
+try:
+	if (os.path.isfile(loggerPath) == False):
+		with open(loggerPath, 'xt') as file:
+			file.write()
+			file.close()
+except:
+	print("Unable to create log file. Exiting program.")
+
+# Set logging configuration
+logging.basicConfig(filename=loggerPath, level=logging.INFO, format=loggerFormat)
+
+def log(multiLog):
+	# check if needs to log to console and file
+	try: multiLog
+	except NameError:
+		multiLog = None
+
+	# allow log to console and file
+	if (multiLog):
+		console = logging.StreamHandler()
+		console.setLevel(logLevel)
+		console.setFormatter(logFormat)
+		logging.getLogger("").addHandler(console)
 
 class trackNetworkSpeed(object):
 	def __init__(self):
